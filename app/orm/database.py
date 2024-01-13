@@ -3,8 +3,8 @@ from app import DATABASE_URL
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-__engine = create_engine(DATABASE_URL)
-SESSION = sessionmaker(bind=__engine, autoflush=False, autocommit=False)
+ENGINE = create_engine(DATABASE_URL)
+SESSION = sessionmaker(bind=ENGINE, autoflush=False, autocommit=False)
 
 
 @wrapt.decorator
