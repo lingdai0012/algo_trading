@@ -3,7 +3,7 @@ from app.orm.database import ENGINE
 from app.orm.models.base import Base
 
 
-class SpotKlines:
+class Klines:
     open_time: Mapped[int] = mapped_column(primary_key=True)
     open: Mapped[float] = mapped_column(nullable=True)
     high: Mapped[float] = mapped_column(nullable=True)
@@ -17,5 +17,5 @@ class SpotKlines:
     taker_buy_base_asset_volume: Mapped[float] = mapped_column(nullable=True)
 
 
-class SpotKlines15mBTCUSDT(Base, SpotKlines):
+class SpotKlines15mBTCUSDT(Base, Klines):
     __tablename__ = "t_spot_klines_15m_btc_usdt"

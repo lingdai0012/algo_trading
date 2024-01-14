@@ -8,6 +8,8 @@ SESSION = sessionmaker(bind=ENGINE, autoflush=False, autocommit=False)
 
 
 @wrapt.decorator
-def with_session(wrapped, instance, args, kwargs):
+def with_session(wrapped, *args, **kwargs):
+    # If 'session' is not in kwargs, add it by creating a new session
     with SESSION.begin() as session:
-        return wrapped(*args, **kwargs, session=session)
+        kwargs.update({"session": session})
+        return wrapped(*args, **kwargs)

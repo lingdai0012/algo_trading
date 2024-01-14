@@ -1,66 +1,35 @@
 import pandas as pd
 from typing import List, Dict
 from binance import Client
-from sqlalchemy import Session, insert
-from app import API_KEY, API_SECRETE
-from app.orm.models import Base
+from sqlalchemy.orm import Session
+from app.data.data_handler import DataHandler
+from app.enum import KlineInterval
+from app.orm.models import KLINES_MAPPER
 
 
-class HistoricalDataHandler:
-    def __init__(
+class HistoricalDataHandler(DataHandler):
+    def __init__(self, session: Session, client: Client) -> None:
+        super().__init__(session=session, client=client)
+
+    def upsert_historical_kline_data(
         self,
-        session: Session,
-        client: Client,
-    ) -> None:
-        self._session = session
-        self._client = client
-
-    def upsert_historical_data(self, values: List[Dict]) -> None:
-        klines = self._client.get_historical_klines(
-            "BTCUSDT", Client.KLINE_INTERVAL_15MINUTE, "13 Jan, 2024"
+        symbol: str,
+        kline_interval: KlineInterval = KlineInterval.KLINE_INTERVAL_15MINUTE,
+        start_timestamp: int | None = None,
+        end_timestamp: int | None = None,
+    ):
+        values = self._client.get_historical_klines(
+            symbol=symbol,
+            interval=kline_interval.value,
+            start_str=start_timestamp,
+            end_str=end_timestamp,
         )
-        klines = pd.DataFrame(
-            klines,
-            columns=[
-                "open_time",
-                "open",
-                "high",
-                "low",
-                "close",
-                "volume",
-                "close_time",
-                "base_asset_volume",
-                "number_of_trades",
-                "taker_buy_volume",
-                "taker_buy_base_asset_volume",
-                "ignore",
-            ],
-        )
-        klines[
-            [
-                "open",
-                "high",
-                "low",
-                "close",
-                "volume",
-                "base_asset_volume",
-                "number_of_trades",
-                "taker_buy_volume",
-                "taker_buy_base_asset_volume",
-            ]
-        ] = klines[
-            [
-                "open",
-                "high",
-                "low",
-                "close",
-                "volume",
-                "base_asset_volume",
-                "number_of_trades",
-                "taker_buy_volume",
-                "taker_buy_base_asset_volume",
-            ]
-        ].astype(
-            float
+        target_table = KLINES_MAPPER[symbol][kline_interval]
+        columns = target_table.__table__.columns
+        columns = [col for col in columns]
+        values = pd.DataFrame(pd.to_numeric(values), columns=columns)
+        values = values.to_dict(orient="records")
+        self._upsert_data(
+            table=target_table, index_elements=[target_table.open_time], values=values
         )
         return
