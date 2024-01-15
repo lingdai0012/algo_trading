@@ -6,5 +6,3 @@ from app.enum import KlineInterval
 class LoadingHistoricalDataDependencies:
     symbol: str
     kline_interval: KlineInterval
-    start_timestamp: int | None = None
-    end_timestamp: int | None = None

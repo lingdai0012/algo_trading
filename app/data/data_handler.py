@@ -1,23 +1,26 @@
 import pandas as pd
-from typing import List, Dict, Any
-from sqlalchemy.orm import Session, InstrumentedAttribute, DeclarativeBase
-from sqlalchemy.dialects.postgresql import insert
+from typing import List, Dict
+from sqlalchemy import delete, insert
+from sqlalchemy.orm import Session, InstrumentedAttribute
 from binance import Client
 
 
-class DataHandler:
+class TimeSeriesDataHandler:
     def __init__(self, session: Session, client: Client) -> None:
         self._session = session
         self._client = client
 
-    def _upsert_data(
+    def _upsert_series_data(
         self,
-        table: DeclarativeBase,
-        index_elements: List[InstrumentedAttribute],
+        table,
+        primary_key: InstrumentedAttribute,
         values: List[Dict],
+        unique_keys: List[int] | None = None,
     ) -> None:
+        if unique_keys is not None:
+            stmt = delete(table).where(primary_key.in_(unique_keys))
+            self._session.execute(stmt)
+            self._session.flush()
         stmt = insert(table).values(values)
-        for value in values:
-            stmt = stmt.on_conflict_do_update(index_elements=index_elements, set_=value)
         self._session.execute(stmt)
         self._session.flush()
