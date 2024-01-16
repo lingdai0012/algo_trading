@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class KlineInterval(str, Enum):
+class KlinesInterval(str, Enum):
     KLINE_INTERVAL_1MINUTE = "1m"
     KLINE_INTERVAL_3MINUTE = "3m"
     KLINE_INTERVAL_5MINUTE = "5m"

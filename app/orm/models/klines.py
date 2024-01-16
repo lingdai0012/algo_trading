@@ -5,6 +5,7 @@ from app.orm.models.base import Base
 
 
 class Klines:
+    __table_args__ = {"extend_existing": True}
     open_time = Column(BIGINT, primary_key=True)
     open: Mapped[float] = mapped_column(nullable=True)
     high: Mapped[float] = mapped_column(nullable=True)
@@ -20,3 +21,31 @@ class Klines:
 
 class SpotKlines15mBTCUSDT(Base, Klines):
     __tablename__ = "t_spot_klines_15m_btc_usdt"
+
+
+class SpotKlines5mBTCUSDT(Base, Klines):
+    __tablename__ = "t_spot_klines_5m_btc_usdt"
+
+
+class SpotKlines3mBTCUSDT(Base, Klines):
+    __tablename__ = "t_spot_klines_3m_btc_usdt"
+
+
+class SpotKlines1mBTCUSDT(Base, Klines):
+    __tablename__ = "t_spot_klines_1m_btc_usdt"
+
+
+class SpotKlines15mETHUSDT(Base, Klines):
+    __tablename__ = "t_spot_klines_15m_eth_usdt"
+
+
+class SpotKlines5mETHUSDT(Base, Klines):
+    __tablename__ = "t_spot_klines_5m_eth_usdt"
+
+
+class SpotKlines3mETHUSDT(Base, Klines):
+    __tablename__ = "t_spot_klines_3m_eth_usdt"
+
+
+class SpotKlines1mETHUSDT(Base, Klines):
+    __tablename__ = "t_spot_klines_1m_eth_usdt"

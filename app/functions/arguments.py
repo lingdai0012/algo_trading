@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from app.enum import KlineInterval
+from app.enum import KlinesInterval
 
 
 @dataclass
 class LoadingHistoricalDataDependencies:
     symbol: str
-    kline_interval: KlineInterval
+    klines_interval: KlinesInterval

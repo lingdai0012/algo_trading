@@ -1,1 +1,1 @@
-from .kline_interval import KlineInterval
+from .kline_interval import KlinesInterval

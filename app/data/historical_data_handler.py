@@ -1,10 +1,11 @@
 import pandas as pd
+import polars as pl
 import numpy as np
 from binance import Client
 from sqlalchemy.orm import Session
 from app.data.data_handler import TimeSeriesDataHandler
-from app.enum import KlineInterval
-from app.orm.models import KLINES_MAPPER
+from app.enum import KlinesInterval
+from app.orm.models import KLINES_TABLE_MAPPER
 
 
 class HistoricalDataHandler(TimeSeriesDataHandler):
@@ -14,7 +15,7 @@ class HistoricalDataHandler(TimeSeriesDataHandler):
     def upsert_historical_kline_data(
         self,
         symbol: str,
-        kline_interval: KlineInterval = KlineInterval.KLINE_INTERVAL_15MINUTE,
+        kline_interval: KlinesInterval = KlinesInterval.KLINE_INTERVAL_15MINUTE,
         start_utc: str | None = None,
         end_utc: str | None = None,
     ) -> int:
@@ -24,16 +25,15 @@ class HistoricalDataHandler(TimeSeriesDataHandler):
             start_str=start_utc,
             end_str=end_utc,
         )
-        target_table = KLINES_MAPPER[symbol][kline_interval]
+        values = np.array(values)[:, :-1]
+        target_table = KLINES_TABLE_MAPPER[symbol][kline_interval]
         columns = target_table.__table__.columns
-        columns = [col.name for col in columns]
-        values = pd.DataFrame(np.array(values)[:, :-1], columns=columns).astype(
-            float
-        )  # remove field ignore
+        values = {columns[ii].name: values[:, ii] for ii in range(len(columns))}
+        values = pl.DataFrame(values).cast(pl.Float64)  # remove field ignore
         self._upsert_series_data(
             table=target_table,
             primary_key=target_table.open_time,
-            values=values.to_dict(orient="records"),
-            unique_keys=values["open_time"].tolist(),
+            values=values.to_dicts(),
+            unique_keys=values["open_time"].to_list(),
         )
-        return values["close_time"].iloc[-1]
+        return values["close_time"][-1]
