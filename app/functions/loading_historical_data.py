@@ -52,12 +52,12 @@ if __name__ == "__main__":
     from app.enum.kline_interval import KlinesInterval
     from app.orm.database import SESSION
 
-    tickers = ["ETHUSDT"]
+    tickers = ["BTCUSDT", "ETHUSDT"]
     klines_intervals = [
-        # KlinesInterval.KLINE_INTERVAL_1MINUTE,
+        KlinesInterval.KLINE_INTERVAL_1MINUTE,
         KlinesInterval.KLINE_INTERVAL_3MINUTE,
-        # KlinesInterval.KLINE_INTERVAL_5MINUTE,
-        # KlinesInterval.KLINE_INTERVAL_15MINUTE,
+        KlinesInterval.KLINE_INTERVAL_5MINUTE,
+        KlinesInterval.KLINE_INTERVAL_15MINUTE,
     ]
     with SESSION.begin() as session:
         logging.info("Starting loading process...")
